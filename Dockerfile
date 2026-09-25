@@ -1,1 +1,1 @@
-FROM docker.io/library/alpine:3.12
+FROM hub.ark.jcloud.com/library/centos:7.3
