@@ -1,1 +1,3 @@
-FROM hub.ark.jcloud.com/library/centos:7.3
+FROM scratch
+ADD rootfs.tar /
+ENTRYPOINT ["/bin/sh","-c"]
